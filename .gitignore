@@ -12,5 +12,4 @@ target/
 # IDE
 .vscode
 
-.cargo
 Cargo.lock
