@@ -24,6 +24,7 @@ pub type MessageReceiverFor<ActorT> = MessageReceiver<MessageFor<ActorT>>;
 pub type ChannelStorage<MessageT> = static_cell::StaticCell<MessageStream<MessageT>>;
 pub type ChannelStorageFor<ActorT> = ChannelStorage<MessageFor<ActorT>>;
 
+#[macro_export]
 macro_rules! actor_spawn {
     ($spawner:expr, $name:ident, $actor_type:ty, $instance:expr) => {{
         const MESSAGE_STREAM_SIZE: usize = crate::actor::MESSAGE_STREAM_SIZE;

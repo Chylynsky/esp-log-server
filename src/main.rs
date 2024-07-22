@@ -1,6 +1,5 @@
 #![no_std]
 #![no_main]
-#[macro_use]
 
 mod actor;
 
@@ -39,12 +38,14 @@ macro_rules! make_static {
     }};
 }
 
+const DEFAULT_SERVER_PORT: u16 = 3030;
+const DEFAULT_WIFI_STACK_SEED: u64 = 1234;
+const UART_READ_CHUNK_SIZE: usize = 32;
+
 const WIFI_SSID: &str = env!("WIFI_SSID");
 const WIFI_PASSWORD: &str = env!("WIFI_PASS");
+const WIFI_STACK_SEED: &str = env!("WIFI_STACK_SEED");
 const SERVER_PORT: &str = env!("LOG_SERVER_PORT");
-
-const DEFAULT_SERVER_PORT: u16 = 3030;
-const UART_READ_CHUNK_SIZE: usize = 32;
 
 struct LogSenderMessage {
     chunk: Vec<u8, UART_READ_CHUNK_SIZE>,
@@ -151,7 +152,7 @@ async fn wifi_connect(
             wifi_interface,
             Config::dhcpv4(Default::default()),
             make_static!(StackResources<3>, StackResources::<3>::new()),
-            str::parse::<u64>(env!("WIFI_STACK_SEED")).expect("Invalid WiFi stack seed."),
+            str::parse::<u64>(WIFI_STACK_SEED).unwrap_or(DEFAULT_WIFI_STACK_SEED),
         )
     );
 
@@ -228,6 +229,7 @@ async fn main(spawner: Spawner) {
     );
 
     log::info!("Spawning uart_sender actor.");
+    log::info!("Receiving data on GPIO pins: tx: 1, rx: 3");
     let _uart_reader = actor_spawn!(
         spawner,
         uart_reader_task,
